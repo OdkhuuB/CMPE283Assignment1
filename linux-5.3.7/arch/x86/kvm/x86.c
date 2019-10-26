@@ -7270,6 +7270,13 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
 	}
 
 	switch (nr) {
+
+//Adding a new switch case to catch the 0x283
+	case 0x283:
+	    ret = 0x0033383245504D43;
+
+		break;
+
 	case KVM_HC_VAPIC_POLL_IRQ:
 		ret = 0;
 		break;
