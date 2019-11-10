@@ -9,6 +9,9 @@
  * Copyright IBM Corporation, 2008
  */
 
+//test change
+//identifing classes to change
+
 #include <linux/kvm_host.h>
 #include <linux/export.h>
 #include <linux/vmalloc.h>
@@ -1017,7 +1020,12 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 
 	eax = kvm_rax_read(vcpu);
 	ecx = kvm_rcx_read(vcpu);
+
+
 	kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
+
+
+
 	kvm_rax_write(vcpu, eax);
 	kvm_rbx_write(vcpu, ebx);
 	kvm_rcx_write(vcpu, ecx);
@@ -1025,3 +1033,6 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 	return kvm_skip_emulated_instruction(vcpu);
 }
 EXPORT_SYMBOL_GPL(kvm_emulate_cpuid);
+
+
+
