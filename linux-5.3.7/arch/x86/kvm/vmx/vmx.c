@@ -5808,7 +5808,7 @@ void dump_vmcs(void)
 static int vmx_handle_exit(struct kvm_vcpu *vcpu)
 {
 
-    atomic_inc(exit_counter);
+    atomic_inc(&exit_counter);
 
 
 	struct vcpu_vmx *vmx = to_vmx(vcpu);
