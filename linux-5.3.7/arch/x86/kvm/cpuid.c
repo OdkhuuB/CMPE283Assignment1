@@ -32,7 +32,8 @@
 //this global variable did not work
 //extern int exit_counter; 
 
-extern atomic_t exit_counter;
+atomic_t exit_counter;
+EXPORT_SYMBOL(exit_counter);
 
 
 static u32 xstate_required_size(u64 xstate_bv, bool compacted)

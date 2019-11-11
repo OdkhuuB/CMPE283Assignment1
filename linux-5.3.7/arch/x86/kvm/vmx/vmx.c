@@ -68,9 +68,11 @@ MODULE_AUTHOR("Qumranet");
 MODULE_LICENSE("GPL");
 
 //declaring atomic counter here
-atomic_t exit_counter = ATOMIC_INIT(0);
+extern atomic_t exit_counter;
+// = ATOMIC_INIT(0);
 
-EXPORT_SYMBOL(exit_counter);
+//may not need this here
+//EXPORT_SYMBOL(exit_counter);
 
 
 
