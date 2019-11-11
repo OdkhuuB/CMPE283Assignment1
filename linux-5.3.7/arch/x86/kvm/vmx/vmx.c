@@ -67,7 +67,8 @@
 MODULE_AUTHOR("Qumranet");
 MODULE_LICENSE("GPL");
 
-int exit_counter = 0;
+//declaring atomic counter here
+atomic_t exit_counter = ATOMIC_INIT(0);
 
 EXPORT_SYMBOL(exit_counter);
 
@@ -5807,7 +5808,7 @@ void dump_vmcs(void)
 static int vmx_handle_exit(struct kvm_vcpu *vcpu)
 {
 
-    exit_counter = exit_counter+1;
+    atomic_inc(exit_counter);
 
 
 	struct vcpu_vmx *vmx = to_vmx(vcpu);

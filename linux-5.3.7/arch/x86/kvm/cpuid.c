@@ -26,7 +26,13 @@
 #include "mmu.h"
 #include "trace.h"
 #include "pmu.h"
-#include "vmx/vmx.h"
+//not needed
+//#include "vmx/vmx.h"
+
+//this global variable did not work
+//extern int exit_counter; 
+
+extern atomic_t exit_counter;
 
 
 static u32 xstate_required_size(u64 xstate_bv, bool compacted)
@@ -1024,8 +1030,19 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 	ecx = kvm_rcx_read(vcpu);
 
 
-	kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
+	if (eax == 0x4FFFFFFF) 
+		{
+			eax = atomic_read(&exit_counter); 
+			
 
+
+		}
+
+	else 
+		{
+			kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
+
+		 }
 
 
 	kvm_rax_write(vcpu, eax);
