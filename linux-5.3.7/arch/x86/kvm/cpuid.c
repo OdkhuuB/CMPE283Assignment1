@@ -1025,8 +1025,13 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 	ecx = kvm_rcx_read(vcpu);
 
 
-	kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
 
+	if (eax == 0x4FFFFFFF)
+        {
+            eax = exit_counter;
+        }
+
+	kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
 
 
 	kvm_rax_write(vcpu, eax);
