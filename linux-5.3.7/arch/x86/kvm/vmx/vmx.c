@@ -67,6 +67,13 @@
 MODULE_AUTHOR("Qumranet");
 MODULE_LICENSE("GPL");
 
+int exit_counter;
+exit_counter = 0;
+
+EXPORT_SYMBOL(exit_counter);
+
+
+
 static const struct x86_cpu_id vmx_cpu_id[] = {
 	X86_FEATURE_MATCH(X86_FEATURE_VMX),
 	{}

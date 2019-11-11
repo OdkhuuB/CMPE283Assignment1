@@ -26,6 +26,9 @@
 #include "mmu.h"
 #include "trace.h"
 #include "pmu.h"
+#include "vmx/vmx.c"
+
+extern int exit_counter;
 
 static u32 xstate_required_size(u64 xstate_bv, bool compacted)
 {
