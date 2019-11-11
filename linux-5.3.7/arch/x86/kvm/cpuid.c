@@ -26,9 +26,8 @@
 #include "mmu.h"
 #include "trace.h"
 #include "pmu.h"
-#include "vmx/vmx.c"
+#include "vmx/vmx.h"
 
-extern int exit_counter;
 
 static u32 xstate_required_size(u64 xstate_bv, bool compacted)
 {
@@ -1025,13 +1024,8 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 	ecx = kvm_rcx_read(vcpu);
 
 
-
-	if (eax == 0x4FFFFFFF)
-        {
-            eax = exit_counter;
-        }
-
 	kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
+
 
 
 	kvm_rax_write(vcpu, eax);

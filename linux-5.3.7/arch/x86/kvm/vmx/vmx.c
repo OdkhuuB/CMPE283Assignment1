@@ -67,8 +67,7 @@
 MODULE_AUTHOR("Qumranet");
 MODULE_LICENSE("GPL");
 
-int exit_counter;
-exit_counter = 0;
+int exit_counter = 0;
 
 EXPORT_SYMBOL(exit_counter);
 
