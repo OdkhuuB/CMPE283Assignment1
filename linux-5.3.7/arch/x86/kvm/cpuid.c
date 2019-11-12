@@ -36,6 +36,8 @@
 atomic_t exit_counter;
 EXPORT_SYMBOL(exit_counter);
 
+atomic64_t cycle_counter;
+EXPORT_SYMBOL(cycle_counter);
 
 static u32 xstate_required_size(u64 xstate_bv, bool compacted)
 {
@@ -1031,7 +1033,8 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 	eax = kvm_rax_read(vcpu);
 	ecx = kvm_rcx_read(vcpu);
 
-
+	uint64_t low;
+	uint64_t high;
 
 
 	switch (eax)
@@ -1040,10 +1043,20 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 			eax = atomic_read(&exit_counter); 
 			break;
 		case 0x4FFFFFFE:
+
+
+
+			low = atomic64_read(&cycle_counter);
+			high = atomic64_read(&cycle_counter); 
+
+			ebx = high;
+			ecx = low;
 			break;
 		default:
 			kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
 	}
+
+
 
 
 

@@ -69,6 +69,10 @@ MODULE_LICENSE("GPL");
 
 //declaring atomic counter here
 extern atomic_t exit_counter;
+
+extern atomic64_t cycle_counter;
+
+
 // = ATOMIC_INIT(0);
 
 //may not need this here
@@ -5810,8 +5814,13 @@ void dump_vmcs(void)
 static int vmx_handle_exit(struct kvm_vcpu *vcpu)
 {
 
+
+//t0 = rtsc()
+	uint64_t startCycle = rdtsc();
+    
     atomic_inc(&exit_counter);
 
+    
 
 	struct vcpu_vmx *vmx = to_vmx(vcpu);
 	u32 exit_reason = vmx->exit_reason;
@@ -5899,13 +5908,26 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu)
 
 	if (exit_reason < kvm_vmx_max_exit_handlers
 	    && kvm_vmx_exit_handlers[exit_reason])
-		return kvm_vmx_exit_handlers[exit_reason](vcpu);
+		{
+
+	
+		int someName = kvm_vmx_exit_handlers[exit_reason](vcpu);
+	
+
+		uint64_t endCycle = rdtsc();
+    	uint64_t diff = endCycle - startCycle;
+    	atomic64_add_return(diff,&cycle_counter);
+    	return someName;
+    }
+
 	else {
 		vcpu_unimpl(vcpu, "vmx: unexpected exit reason 0x%x\n",
 				exit_reason);
 		kvm_queue_exception(vcpu, UD_VECTOR);
 		return 1;
 	}
+
+	//t1= rts()-t0
 }
 
 /*
