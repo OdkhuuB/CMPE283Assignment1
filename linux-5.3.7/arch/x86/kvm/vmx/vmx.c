@@ -67,17 +67,11 @@
 MODULE_AUTHOR("Qumranet");
 MODULE_LICENSE("GPL");
 
-//declaring atomic counter here
+//declaring exit counter here
 extern atomic_t exit_counter;
 
+//declaring cycle counter
 extern atomic64_t cycle_counter;
-
-
-// = ATOMIC_INIT(0);
-
-//may not need this here
-//EXPORT_SYMBOL(exit_counter);
-
 
 
 static const struct x86_cpu_id vmx_cpu_id[] = {
@@ -5821,7 +5815,6 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu)
     atomic_inc(&exit_counter);
 
     
-
 	struct vcpu_vmx *vmx = to_vmx(vcpu);
 	u32 exit_reason = vmx->exit_reason;
 	u32 vectoring_info = vmx->idt_vectoring_info;
@@ -5910,14 +5903,13 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu)
 	    && kvm_vmx_exit_handlers[exit_reason])
 		{
 
+		int exitHandlerOutput = kvm_vmx_exit_handlers[exit_reason](vcpu);
 	
-		int someName = kvm_vmx_exit_handlers[exit_reason](vcpu);
-	
-
 		uint64_t endCycle = rdtsc();
     	uint64_t diff = endCycle - startCycle;
     	atomic64_add_return(diff,&cycle_counter);
-    	return someName;
+
+    	return exitHandlerOutput;
     }
 
 	else {
