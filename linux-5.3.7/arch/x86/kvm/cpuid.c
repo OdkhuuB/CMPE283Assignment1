@@ -26,6 +26,7 @@
 #include "mmu.h"
 #include "trace.h"
 #include "pmu.h"
+//#include <math.h>
 //not needed
 //#include "vmx/vmx.h"
 
@@ -1031,19 +1032,50 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 	ecx = kvm_rcx_read(vcpu);
 
 
-	if (eax == 0x4FFFFFFF) 
-		{
+
+
+	switch (eax)
+	{
+		case 0x4FFFFFFF:
 			eax = atomic_read(&exit_counter); 
+			break;
+		case 0x4FFFFFFE:
+			break;
+		default:
+			kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
+	}
+
+
+
+
+
+	//if (eax == 0x4FFFFFFF) 
+	//	{
+			//int decimal_number = 0, remainder, hexadecimal_number;
+      		//int count = 0;
+			//while(exit_counter > 0)
+     		//{
+	          //  remainder = exit_counter % 10;
+	            //decimal_number = decimal_number + remainder * pow(16, count);
+	            //exit_counter = exit_counter / 10;
+	            //count++;
+      		//}
+      		//printf("\nDecimal Equivalent:\t%d\n", decimal_number);
+
+
+
+		//	eax = atomic_read(&exit_counter); 
+			//eax = atomic_read(count);
 			
 
 
-		}
+		//}
 
-	else 
-		{
-			kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
+	//else 
+	//	{
+	//		kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
 
-		 }
+	//	 }
 
 
 	kvm_rax_write(vcpu, eax);
