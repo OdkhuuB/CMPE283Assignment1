@@ -39,6 +39,11 @@ EXPORT_SYMBOL(exit_counter);
 atomic64_t cycle_counter;
 EXPORT_SYMBOL(cycle_counter);
 
+//temp vanu
+atomic64_t cpuidR;
+EXPORT_SYMBOL(cpuidR);
+
+
 static u32 xstate_required_size(u64 xstate_bv, bool compacted)
 {
 	int feature_bit = 0;
@@ -1041,6 +1046,7 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 	{
 		//returning the number of exits
 		case 0x4FFFFFFF:
+			printk(KERN_EMERG "count of cpuid exit: %d", atomic64_read(&cpuidR));
 			eax = atomic_read(&exit_counter); 
 			break;
 		//returning the cycles

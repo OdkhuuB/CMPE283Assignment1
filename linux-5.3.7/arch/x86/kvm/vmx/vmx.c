@@ -73,6 +73,9 @@ extern atomic_t exit_counter;
 //declaring cycle counter
 extern atomic64_t cycle_counter;
 
+//temp-vanu
+extern atomic64_t cpuidR;
+
 
 static const struct x86_cpu_id vmx_cpu_id[] = {
 	X86_FEATURE_MATCH(X86_FEATURE_VMX),
@@ -5808,16 +5811,19 @@ void dump_vmcs(void)
 static int vmx_handle_exit(struct kvm_vcpu *vcpu)
 {
 
-
-//t0 = rtsc()
 	uint64_t startCycle = rdtsc();
     
     atomic_inc(&exit_counter);
+
+
 
     
 	struct vcpu_vmx *vmx = to_vmx(vcpu);
 	u32 exit_reason = vmx->exit_reason;
 	u32 vectoring_info = vmx->idt_vectoring_info;
+
+	//temp
+	//exitR = vmx->exit_reason;
 
 	trace_kvm_exit(exit_reason, vcpu, KVM_ISA_VMX);
 
@@ -5908,6 +5914,35 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu)
 		uint64_t endCycle = rdtsc();
     	uint64_t diff = endCycle - startCycle;
     	atomic64_add_return(diff,&cycle_counter);
+
+    	
+
+    	//temp-vanu
+		//printk(KERN_EMERG "vanu5: %s", exit_reason);
+    	int reasonList[kvm_vmx_max_exit_handlers];
+
+    	reasonList[exit_reason]++;
+
+    	if(10 == exit_reason){
+    		atomic64_inc(&cpuidR);
+    	//	printk(KERN_EMERG "vanu 7 - inside cpuid");
+    	//	reasonList[exit_reason] = reasonList[exit_reason] ++;
+    	//	printk(KERN_EMERG "vanu8");
+    	//	printk(KERN_EMERG "vanu9: %25s", reasonList[EXIT_REASON_CPUID]);
+    	}
+
+    	int i;
+    	for(i=0;i<kvm_vmx_max_exit_handlers;i++){
+    		printk(KERN_EMERG "count of %d exit : %d", i, reasonList[i]);
+    	}
+    	
+    		
+    	//}
+
+
+
+
+
 
     	return exitHandlerOutput;
     }
