@@ -5917,8 +5917,8 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu)
 
     	
 
-    	//temp-vanu
-		//printk(KERN_EMERG "vanu5: %s", exit_reason);
+    	//calculating exits for each exit reason
+		
     	int reasonList[kvm_vmx_max_exit_handlers];
 
     	reasonList[exit_reason]++;
