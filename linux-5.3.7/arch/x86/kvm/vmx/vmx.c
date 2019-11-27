@@ -76,6 +76,11 @@ extern atomic64_t cycle_counter;
 //temp-vanu
 extern atomic64_t cpuidR;
 
+//declaring counter for particular exit
+extern atomic_t single_exit;
+extern int reasonList[68];
+extern int cycleList[68];
+
 
 static const struct x86_cpu_id vmx_cpu_id[] = {
 	X86_FEATURE_MATCH(X86_FEATURE_VMX),
@@ -5818,12 +5823,33 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu)
 
 
     
+
+    
 	struct vcpu_vmx *vmx = to_vmx(vcpu);
 	u32 exit_reason = vmx->exit_reason;
 	u32 vectoring_info = vmx->idt_vectoring_info;
 
 	//temp
 	//exitR = vmx->exit_reason;
+
+	//vanu
+	// exit count for particular exit reason
+	u32 ecx;
+	//u32 eax;
+	ecx = kvm_rbx_read(vcpu);
+	//eax = kvm_rax_read(vcpu);
+
+	//if(eax == 0x4FFFFFFD){
+		//printk(KERN_EMERG "cmpe283ax : %d", eax);
+		printk(KERN_EMERG "cmpe283cx : %d", ecx);
+	    if(exit_reason == ecx){
+		//if(0x00000024 == ecx){
+	    	printk(KERN_EMERG "cmpe283ecx : %d", ecx);
+	    	atomic_inc(&single_exit);	
+	    	printk(KERN_EMERG "ecx : %d exit reason : %d", ecx, single_exit);
+	    }
+	//}
+	
 
 	trace_kvm_exit(exit_reason, vcpu, KVM_ISA_VMX);
 
@@ -5916,12 +5942,17 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu)
     	atomic64_add_return(diff,&cycle_counter);
 
     	
+    	cycleList[exit_reason] = cycleList[exit_reason] + diff;
+
+
 
     	//calculating exits for each exit reason
 		
-    	int reasonList[kvm_vmx_max_exit_handlers];
+    	//int reasonList[kvm_vmx_max_exit_handlers];
 
     	reasonList[exit_reason]++;
+
+    	
 
     	if(10 == exit_reason){
     		atomic64_inc(&cpuidR);
@@ -5933,7 +5964,10 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu)
 
     	int i;
     	for(i=0;i<kvm_vmx_max_exit_handlers;i++){
-    		printk(KERN_EMERG "count of %d exit : %d", i, reasonList[i]);
+    		if(reasonList[i] > 0){
+    			printk(KERN_EMERG "count of %d exit : %d", i, reasonList[i]);
+    		}
+    		
     	}
     	
     		

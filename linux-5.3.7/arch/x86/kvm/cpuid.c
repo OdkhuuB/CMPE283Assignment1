@@ -43,6 +43,15 @@ EXPORT_SYMBOL(cycle_counter);
 atomic64_t cpuidR;
 EXPORT_SYMBOL(cpuidR);
 
+atomic_t single_exit;
+EXPORT_SYMBOL(single_exit);
+
+int reasonList[68];
+EXPORT_SYMBOL(reasonList);
+
+int cycleList[68];
+EXPORT_SYMBOL(cycleList);
+
 
 static u32 xstate_required_size(u64 xstate_bv, bool compacted)
 {
@@ -1041,12 +1050,15 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 	uint64_t low;
 	uint64_t high;
 
+	uint64_t lowBit;
+	uint64_t highBit;
+
 
 	switch (eax)
 	{
 		//returning the number of exits
 		case 0x4FFFFFFF:
-			printk(KERN_EMERG "count of cpuid exit: %d", atomic64_read(&cpuidR));
+			//printk(KERN_EMERG "count of cpuid exit: %d", atomic64_read(&cpuidR));
 			eax = atomic_read(&exit_counter); 
 			break;
 		//returning the cycles
@@ -1056,6 +1068,17 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 
 			ebx = high;
 			ecx = low;
+			break;
+		case 0x4FFFFFFD:
+			//eax = atomic_read(&single_exit);
+			eax = reasonList[ecx];
+			break;
+		case 0x4FFFFFFC:
+			lowBit = cycleList[ecx] & 0xffffffff;
+			highBit = cycleList[ecx] >> 32; 
+
+			ebx = highBit;
+			ecx = lowBit;
 			break;
 		default:
 			kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
