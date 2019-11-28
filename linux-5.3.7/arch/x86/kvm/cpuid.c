@@ -49,7 +49,8 @@ EXPORT_SYMBOL(single_exit);
 int reasonList[68];
 EXPORT_SYMBOL(reasonList);
 
-int cycleList[68];
+//int cycleList[68];
+uint64_t cycleList[68];
 EXPORT_SYMBOL(cycleList);
 
 
@@ -1074,11 +1075,31 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 			eax = reasonList[ecx];
 			break;
 		case 0x4FFFFFFC:
-			lowBit = cycleList[ecx] & 0xffffffff;
-			highBit = cycleList[ecx] >> 32; 
+			//atomic64_t cycle = cycleList[ecx];
+			//lowBit = cycle & 0xffffffff;
+			//highBit = cycle >> 32; 
 
-			ebx = highBit;
-			ecx = lowBit;
+
+			// returning 0 for all the exit reasons not in SDM
+			if(ecx == 35 || ecx == 38 || ecx == 42 || ecx > 68 || ecx < 0){
+				ebx = 0;
+				ecx = 0;
+			}
+			else if (cycleList[ecx] > 0 ){
+
+				uint64_t cycleTime = cycleList[ecx];
+				printk(KERN_EMERG "RETURN : %d", cycleTime);
+
+				lowBit = cycleList[ecx] & 0xffffffff;
+				highBit = cycleList[ecx] >> 32; 
+
+				ebx = highBit;
+				ecx = lowBit;
+			}
+			else{
+				ebx = 0;
+				ecx = 0;
+			}
 			break;
 		default:
 			kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);

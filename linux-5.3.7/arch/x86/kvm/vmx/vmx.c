@@ -79,7 +79,11 @@ extern atomic64_t cpuidR;
 //declaring counter for particular exit
 extern atomic_t single_exit;
 extern int reasonList[68];
-extern int cycleList[68];
+
+// cycle counter for particular exit
+//extern atomic64_t cycle;
+//extern int cycleList[68];
+extern uint64_t cycleList[68];
 
 
 static const struct x86_cpu_id vmx_cpu_id[] = {
@@ -5841,7 +5845,7 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu)
 
 	//if(eax == 0x4FFFFFFD){
 		//printk(KERN_EMERG "cmpe283ax : %d", eax);
-		printk(KERN_EMERG "cmpe283cx : %d", ecx);
+		//printk(KERN_EMERG "cmpe283cx : %d", ecx);
 	    if(exit_reason == ecx){
 		//if(0x00000024 == ecx){
 	    	printk(KERN_EMERG "cmpe283ecx : %d", ecx);
@@ -5941,9 +5945,18 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu)
     	uint64_t diff = endCycle - startCycle;
     	atomic64_add_return(diff,&cycle_counter);
 
-    	
-    	cycleList[exit_reason] = cycleList[exit_reason] + diff;
 
+    	// incrementing the cycle count for a reason code
+    	//atomic64_add_return(diff,&cycle);
+    	//cycleList[exit_reason] = cycleList[exit_reason] + diff;
+
+    	uint64_t cycle = cycleList[exit_reason];
+    	//atomic64_read(cycleList[exit_reason]);
+
+    	printk(KERN_EMERG "cycle List %d", cycle);
+    	//atomic64_add_return(diff,&cycle);
+    	printk(KERN_EMERG "cycle diff %d", diff);
+    	cycleList[exit_reason] = cycle+diff;
 
 
     	//calculating exits for each exit reason
@@ -5966,6 +5979,7 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu)
     	for(i=0;i<kvm_vmx_max_exit_handlers;i++){
     		if(reasonList[i] > 0){
     			printk(KERN_EMERG "count of %d exit : %d", i, reasonList[i]);
+    			printk(KERN_EMERG "cycle of %d exit : %d", i, cycleList[i]);
     		}
     		
     	}
