@@ -1071,8 +1071,25 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 			ecx = low;
 			break;
 		case 0x4FFFFFFD:
-			//eax = atomic_read(&single_exit);
-			eax = reasonList[ecx];
+			// returning 0 for all the exit reasons not in SDM
+			if(ecx == 35 || ecx == 38 || ecx == 42 || ecx > 68 || ecx < 0){
+				eax = 0;
+				ebx = 0;
+				ecx = 0;
+				edx = 0xFFFFFFFF;
+			}
+			//handles the exit reason not in KVM and returns 0 in all registers
+			else if (cycleList[ecx] > 0){
+				eax = reasonList[ecx];
+			}
+			else{
+				eax = 0;
+				ebx = 0;
+				ecx = 0;
+				edx = 0;
+			}
+
+			
 			break;
 		case 0x4FFFFFFC:
 			//atomic64_t cycle = cycleList[ecx];
@@ -1082,13 +1099,17 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 
 			// returning 0 for all the exit reasons not in SDM
 			if(ecx == 35 || ecx == 38 || ecx == 42 || ecx > 68 || ecx < 0){
+				eax = 0;
 				ebx = 0;
 				ecx = 0;
+				edx = 0xFFFFFFFF;
 			}
+
+			//handles the exit reason not in KVM and returns 0 in all registers
 			else if (cycleList[ecx] > 0 ){
 
 				uint64_t cycleTime = cycleList[ecx];
-				printk(KERN_EMERG "RETURN : %d", cycleTime);
+				//printk(KERN_EMERG "RETURN : %d", cycleTime);
 
 				lowBit = cycleList[ecx] & 0xffffffff;
 				highBit = cycleList[ecx] >> 32; 
@@ -1097,8 +1118,10 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 				ecx = lowBit;
 			}
 			else{
+				eax = 0;
 				ebx = 0;
 				ecx = 0;
+				edx = 0;
 			}
 			break;
 		default:
